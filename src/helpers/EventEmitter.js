@@ -16,4 +16,10 @@ export default class EventEmitter {
             callback(...a);
         }
     }
+    // static get global() {
+    //     if (!this._global) {
+    //         this._global = new EventEmitter();
+    //     }
+    //     return this._global;
+    // }
 }

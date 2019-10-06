@@ -2,3 +2,9 @@ html, body {
     padding: 0px;
     margin: 0px;
 }
+
+body {
+    background-image: url(https://www.metoffice.gov.uk/binaries/content/gallery/metofficegovuk/hero-images/weather/cloud/cumulus-cloud.jpg);
+    background-position: center center;
+    background-size: auto 100%;
+}
