@@ -1,0 +1,27 @@
+{
+  "name": "toci3d",
+  "version": "1.0.0",
+  "description": "Trip of cube in 3D",
+  "scripts": {
+    "start": "webpack-dev-server --config ./webpack.config.js --mode development",
+    "build": "webpack --mode production",
+    "serve": "node ./dist/server.js"
+  },
+  "author": "Roman Bauer",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "babel-loader": "^8.0.4",
+    "http-server": "^0.11.1",
+    "uglifyjs-webpack-plugin": "^2.0.1",
+    "webpack": "^4.22.0",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/romasan/toci3d.git"
+  },
+  "homepage": "https://romasan.github.io/toci3d"
+}

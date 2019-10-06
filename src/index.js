@@ -1,25 +1,6 @@
-const debounce = (f, t, x) => (...a) => { clearTimeout(x), x = setTimeout(f, t, ...a); }
-const trottle = (f, t, x = Date.now() - t) => (...a) => { Date.now() - x >= t && f(...a), x = Date.now(); }
+import { trottle } from './helpers/';
 
-class EventEmitter {
-    constructor() {
-        this.events = {};
-    }
-    on(event, callback) {
-
-        if (!this.events[event]) {
-            this.events[event] = [];
-        }
-
-        typeof callback === 'function' && this.events[event].push(callback);
-    }
-    emit(event, ...a) {
-
-        for (const callback of this.events[event] || []) {
-            callback(...a);
-        }
-    }
-}
+import EventEmitter from './helpers/EventEmitter.js';
 const ev = new EventEmitter();
 
 const state = {};

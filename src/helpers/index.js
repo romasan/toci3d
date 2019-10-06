@@ -1,0 +1,2 @@
+export const debounce = (f, t, x) => (...a) => { clearTimeout(x), x = setTimeout(f, t, ...a); }
+export const trottle = (f, t, x = Date.now() - t) => (...a) => { Date.now() - x >= t && f(...a), x = Date.now(); }
