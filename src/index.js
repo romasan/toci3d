@@ -99,11 +99,16 @@ const main = () => {
     controls.on('rotate', v => {
         avatar.rotate(v);
     });
+    controls.on('rotateB', v => {
+        gl.camera.rotation.y += v.x;
+        gl.camera.rotation.x += v.y;
+    });
     // controls.on('move', avatar.move);
 
     raf.add(
-        () => controls.gamepad(),
-        gl.update
+        // () => controls.gamepad(),
+        controls.update,
+        gl.render
     );
 
     // const canvas = new el(wrap, 'canvas').el;

@@ -3,8 +3,7 @@ import * as THREE from 'three';
 export default wrap => {
 
     const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-    camera.position.z = .5;
-    // camera.rotation.z = .1;
+    camera.position.z = 1.0;
  
     const scene = new THREE.Scene();
  
@@ -34,7 +33,8 @@ export default wrap => {
 
     return {
         scene,
-        update: () => {
+        camera,
+        render: () => {
             renderer.render( scene, camera );
         }
     }

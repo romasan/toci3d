@@ -15,10 +15,10 @@ export default class Controls extends EventEmitter {
             if (keys[65]) { this.emit('rotate', v2d(-kstep, 0)); } // a
             if (keys[83]) { this.emit('rotate', v2d(0, -kstep)); } // s
             if (keys[68]) { this.emit('rotate', v2d(kstep, 0)); } // d
-            // if (keys[38]) { avatar.rotate(v2d(0, 1)); } // up
-            // if (keys[37]) { avatar.rotate(v2d(-1, 0)); } // left
-            // if (keys[40]) { avatar.rotate(v2d(0, -1)); } // down
-            // if (keys[39]) { avatar.rotate(v2d(1, 0)); } // right
+            if (keys[38]) { this.emit('rotateB', v2d(0, .1)); } // up
+            if (keys[37]) { this.emit('rotateB', v2d(-.1, 0)); } // left
+            if (keys[40]) { this.emit('rotateB', v2d(0, -.1)); } // down
+            if (keys[39]) { this.emit('rotateB', v2d(.1, 0)); } // right
             // if (keys[16] === 1) { avatar.move(); } // shift
         }
         const checkKeyUp = e => {
@@ -34,13 +34,20 @@ export default class Controls extends EventEmitter {
                 ), gstep));
             }
             if (e.RgtStkG || e.RgtStkV) {
-                // world.rotate();
+                this.emit('rotateB', mult2d(v2d(
+                    e.RgtStkG,
+                    e.RgtStkV
+                ), .01));
             }
             // e.rt ? avatar.move() : avatar.stop();
         }
         this.on('gamepadUpdate', checkGamepad);
-        document.body.addEventListener('keydown', checkKeyDown)
-        document.body.addEventListener('keyup', checkKeyUp)
+        document.body.addEventListener('keydown', checkKeyDown);
+        document.body.addEventListener('keyup', checkKeyUp);
+
+        this.update = () => {
+            this.gamepad();
+        }
     }
     gamepad() {
         const gp = navigator.getGamepads && navigator.getGamepads()[0];
