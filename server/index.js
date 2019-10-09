@@ -1,35 +1,37 @@
-var http = require('http');
-var WebSocketServer = require('ws').Server;
+const http = require('http');
+const WebSocketServer = require('ws').Server;
 
-function v2d(x, y) {
-    return {
-        x: x || 0,
-        y: y || 0
-    };
-}
+const { v2d, v3d } = require('./helpers.js');
 
-function v3d(x, y, z) {
-    return {
-        x: x || 0,
-        y: y || 0,
-        z: z || 0
-    };
-}
+const host = process.env.ADDR || "127.0.0.1";
+const port = process.env.PORT || 80;
 
-var host = process.env.ADDR || "127.0.0.1";
-var port = process.env.PORT || 80;
+let webCounter = 0;
 
-var server = http.createServer(function(request, response) {
+const server = http.createServer(function(request, response) {
+    if (request.url === '/favicon.ico') {
+        response.writeHead(200, {'Content-Type': 'image/x-icon'});
+        response.end('');
+        return;    
+    }
 	response.writeHead(200, {'Content-Type': 'text/html'});
-	response.end(':)');
+	response.end(
+`<html>
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+Поздравляю! ты ${++webCounter}-й кто зачем-то сюда зашёл :)
+</body>
+</html>`);
 }).listen(port, host);
 
-var wss = new WebSocketServer({
+const wss = new WebSocketServer({
 	server,
 	autoAcceptConnections: false
 });
 
-var clients = {
+const clients = {
     id: {}
 };
 
@@ -61,12 +63,12 @@ wss.on('connection', client => {
     });
     
     client.on('upd', function(data) {
-        for (var key in data) {
+        for (const key in data) {
             if (key != 'client' && key != 'space' && clients[id][key]) {
                 clients[id][key] = data[key];
             }
             if (data.position) {
-                var space = calcSpace(data.position);
+                const space = calcSpace(data.position);
                 if (
                     clients[id].space.x != space.x ||
                     clients[id].space.y != space.y ||

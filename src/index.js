@@ -1,6 +1,6 @@
 import { trottle, el, v3d, v2d, add2d, add3d } from './helpers/';
 import wsClient from './ws.js';
-import iGL from './gl.js';
+import initGL, { Cube } from './gl.js';
 
 import * as THREE from 'three';
 
@@ -12,58 +12,6 @@ const send = trottle(e => {
     // 
 }, 100);
 
-class Cube {
-    constructor(gl, position, direction) {
-
-        const geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
-        // const material = new THREE.MeshNormalMaterial();
-        const texAvatart = new THREE.TextureLoader().load( '/assets/avatar.png' );
-        const texSide = new THREE.TextureLoader().load( '/assets/side.png' );
-        const matAvatar = new THREE.MeshBasicMaterial( { map: texAvatart } );
-        const matSide = new THREE.MeshBasicMaterial( { map: texSide } );
-
-        const materials = [
-            matSide,
-            matSide,
-            matSide,
-            matSide,
-            matAvatar,
-            matSide,
-        ];
-
-        const mesh = new THREE.Mesh( geometry, materials );
-
-        this.position = position || v3d();
-        this.direction = direction || v2d();
-
-        mesh.position.x = this.position.x;
-        mesh.position.y = this.position.x;
-        mesh.position.z = this.position.x;
-
-        mesh.rotation.x = this.direction.x;
-        mesh.rotation.y = this.direction.y;
-
-        gl.scene.add( mesh );
-
-        this.mesh = mesh;
-
-        this.moving = false;
-    }
-    rotate(v) {
-        this.direction = add2d(this.direction, v);
-        this.mesh.rotation.y = this.direction.x;
-        this.mesh.rotation.x = this.direction.y;
-    }
-    move(v) {
-        this.moving = true;
-        // this.position = add3d(this.position, v);
-    }
-    stop() {
-        this.moving = false;
-    }
-}
-
-let runners = [];
 class RoadRunner {
     constructor() {
         this.runners = [];
@@ -84,40 +32,39 @@ class RoadRunner {
 
 const main = () => {
 
-    const raf = new RoadRunner();
-
     const wrap = document.querySelector('#wrap');
+    const gl = initGL(wrap);
 
-    // let e = new el(wrap, 'div', 'avatar');
-    // e.el.style.position = 'absolute';
+    const cubes = [
+        [0, 0, 0],
+        [-.2, .2, 0],
+        [.2, .2, 0],
+        [-.2, -.2, 0],
+        [.2, -.2, 0]
+    ].map(e => Cube(new THREE.Vector3(...e)));
 
-    const gl = iGL(wrap);
-
-    const avatar = new Cube(gl);
+    cubes.forEach(cube => gl.scene.add(cube));
 
     const controls = new Controls();
-    controls.on('rotate', v => {
-        avatar.rotate(v);
+    controls.on('rotateA', v => {
+        cubes.forEach(cube => {
+            cube.rotation.x += v.y;
+            cube.rotation.y += v.x;
+        });
+    }).on('rotateB', v => {
+        gl.camera.rotation.y += -v.x * .5;
+        gl.camera.rotation.x += -v.y * .5;
+    }).on('move', v => {
+        const wd = gl.camera.getWorldDirection(new THREE.Vector3());
+        gl.camera.position.add(wd.multiplyScalar(v))
     });
-    controls.on('rotateB', v => {
-        gl.camera.rotation.y += v.x;
-        gl.camera.rotation.x += v.y;
-    });
-    // controls.on('move', avatar.move);
 
+    const raf = new RoadRunner();
     raf.add(
-        // () => controls.gamepad(),
         controls.update,
         gl.render
     );
 
-    // const canvas = new el(wrap, 'canvas').el;
-
-    // raf.add(() => {
-    //     mesh.rotation.x += 0.01;
-    //     mesh.rotation.y += 0.02;
-    //     gl.update();
-    // });
     wsClient();
 }
 

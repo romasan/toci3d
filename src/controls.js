@@ -1,56 +1,49 @@
 import EventEmitter from './helpers/EventEmitter.js';
 
 import { v2d, add2d, v3d, add3d, mult2d } from './helpers/';
+import { runInThisContext } from 'vm';
 
 export default class Controls extends EventEmitter {
     constructor() {
 
         super();
 
-        const keys = {};
-        const kstep = .15;
+        this.keys = {};
+
         const checkKeyDown = e => {
-            keys[e.keyCode] = keys[e.keyCode] ? keys[e.keyCode] + 1 : 1;
-            if (keys[87]) { this.emit('rotate', v2d(0, kstep)); } // w
-            if (keys[65]) { this.emit('rotate', v2d(-kstep, 0)); } // a
-            if (keys[83]) { this.emit('rotate', v2d(0, -kstep)); } // s
-            if (keys[68]) { this.emit('rotate', v2d(kstep, 0)); } // d
-            if (keys[38]) { this.emit('rotateB', v2d(0, .1)); } // up
-            if (keys[37]) { this.emit('rotateB', v2d(-.1, 0)); } // left
-            if (keys[40]) { this.emit('rotateB', v2d(0, -.1)); } // down
-            if (keys[39]) { this.emit('rotateB', v2d(.1, 0)); } // right
-            // if (keys[16] === 1) { avatar.move(); } // shift
+            this.keys[e.keyCode] = true;
         }
         const checkKeyUp = e => {
-            keys[e.keyCode] = 0;
-            // if (!keys[16]) { avatar.stop(); } // shift
+            this.keys[e.keyCode] = false;
         }
-        const gstep = .1;
-        const checkGamepad = e => {
-            if (e.LftStkG || e.LftStkV) {
-                this.emit('rotate', mult2d(v2d(
-                    e.LftStkG,
-                    e.LftStkV
-                ), gstep));
-            }
-            if (e.RgtStkG || e.RgtStkV) {
-                this.emit('rotateB', mult2d(v2d(
-                    e.RgtStkG,
-                    e.RgtStkV
-                ), .01));
-            }
-            // e.rt ? avatar.move() : avatar.stop();
-        }
-        this.on('gamepadUpdate', checkGamepad);
+
+        this.step = .1;
+
+        // this.on('gamepadUpdate', checkGamepad);
         document.body.addEventListener('keydown', checkKeyDown);
         document.body.addEventListener('keyup', checkKeyUp);
 
-        this.update = () => {
+        this.update = t => {
+            this.keyoard();
             this.gamepad();
         }
     }
+    keyoard() {
+        if (this.keys[87]) { this.emit('rotateA', v2d(0, -this.step)); } // w
+        if (this.keys[65]) { this.emit('rotateA', v2d(-this.step, 0)); } // a
+        if (this.keys[83]) { this.emit('rotateA', v2d(0, this.step)); } // s
+        if (this.keys[68]) { this.emit('rotateA', v2d(this.step, 0)); } // d
+        if (this.keys[38]) { this.emit('rotateB', v2d(0, -this.step)); } // up
+        if (this.keys[37]) { this.emit('rotateB', v2d(-this.step, 0)); } // left
+        if (this.keys[40]) { this.emit('rotateB', v2d(0, this.step)); } // down
+        if (this.keys[39]) { this.emit('rotateB', v2d(this.step, 0)); } // right
+        if (this.keys[16]) { this.emit('move', this.step); } // shift
+        if (this.keys[17]) { this.emit('move', -this.step); } // Ctrl
+    }
     gamepad() {
+
         const gp = navigator.getGamepads && navigator.getGamepads()[0];
+
         if (gp) {
             const { axes, buttons } = gp;
             const [LftStkG, LftStkV, RgtStkG, RgtStkV] = axes.map(e => Math.abs(e) > .0001 ? e : 0);
@@ -61,6 +54,7 @@ export default class Controls extends EventEmitter {
                 LftStkBtn, RgtStkBtn,
                 up, down, left, right,
             ] = buttons.map(e => e.pressed);
+
             this.emit('gamepadUpdate', {
                 LftStkG, LftStkV, LftStkBtn,
                 RgtStkG, RgtStkV, RgtStkBtn,
@@ -69,6 +63,28 @@ export default class Controls extends EventEmitter {
                 select, start,
                 up, down, left, right, 
             });
+
+            if (LftStkG || LftStkV) {
+                this.emit('rotateA', mult2d(v2d(
+                    LftStkG,
+                    LftStkV
+                ), this.step));
+            }
+
+            if (RgtStkG || RgtStkV) {
+                this.emit('rotateB', mult2d(v2d(
+                    RgtStkG,
+                    RgtStkV
+                ), this.step));
+            }
+
+            if (rt) {
+                this.emit('forward');
+            }
+
+            if (lt) {
+                this.emit('back');
+            }
         }
         // gp.vibrationActuator.playEffect("dual-rumble", {
         //     startDelay: 0,
