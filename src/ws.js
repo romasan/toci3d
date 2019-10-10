@@ -9,4 +9,6 @@ export default () => {
     ws.onmessage = e => {
         console.log('Message:', e);
     }
+
+    return ws;
 }

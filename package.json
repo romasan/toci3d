@@ -25,6 +25,7 @@
   },
   "homepage": "https://romasan.github.io/toci3d",
   "dependencies": {
+    "rxjs": "^6.5.3",
     "three": "^0.109.0"
   }
 }

@@ -1,46 +1,24 @@
-import { trottle, el, v3d, v2d, add2d, add3d } from './helpers/';
+import { interval, animationFrameScheduler } from 'rxjs';
 import wsClient from './ws.js';
 import initGL, { Cube } from './gl.js';
+
+import research from './research.js';
 
 import * as THREE from 'three';
 
 import Controls from './controls.js';
 
-const state = {};
-
-const send = trottle(e => {
-    // 
-}, 100);
-
-class RoadRunner {
-    constructor() {
-        this.runners = [];
-        const raf = t => {
-            for (const runner of this.runners) {
-                runner(t);
-            }
-            window.requestAnimationFrame(raf);
-        };
-        window.requestAnimationFrame && window.requestAnimationFrame(raf);
-    }
-    add(...runners) {
-        for (const runner of runners) {
-            typeof runner === 'function' && this.runners.push(runner);
-        }
-    }
-}
-
 const main = () => {
+
+    research();
 
     const wrap = document.querySelector('#wrap');
     const gl = initGL(wrap);
 
     const cubes = [
+        [-.2, .2, 0], [.2, .2, 0],
         [0, 0, 0],
-        [-.2, .2, 0],
-        [.2, .2, 0],
-        [-.2, -.2, 0],
-        [.2, -.2, 0]
+        [-.2, -.2, 0], [.2, -.2, 0]
     ].map(e => Cube(new THREE.Vector3(...e)));
 
     cubes.forEach(cube => gl.scene.add(cube));
@@ -59,13 +37,14 @@ const main = () => {
         gl.camera.position.add(wd.multiplyScalar(v))
     });
 
-    const raf = new RoadRunner();
-    raf.add(
-        controls.update,
-        gl.render
-    );
-
-    wsClient();
+    const FPS = 60;
+    interval(1000 / FPS, animationFrameScheduler)
+        .subscribe(t => {
+            controls.update();
+            gl.render();
+        });
+    
+    // const ws = wsClient();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

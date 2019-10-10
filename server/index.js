@@ -12,6 +12,10 @@ const clients = {
     // id: {}
 };
 
+const channels = {
+    // name: [client1, client2]
+};
+
 let count = 0;
 
 function calcSpace(position) {
@@ -59,9 +63,16 @@ wss.on('connection', client => {
 
     client.on('close', function() {
         console.log('disconnected: client#' + id + ' ' + new Date());
-	    delete clients[id];
+        delete clients[id];
+
 	    // for (var key in clients) {
 	    //   clients[key].send(JSON.stringify(response));
-	    // }
+        // }
+
+        // wss.clients.forEach(function each(client) {
+        //     if (client.readyState === WebSocket.OPEN) {
+        //         client.send(data);
+        //     }
+        // });
     });
 });
