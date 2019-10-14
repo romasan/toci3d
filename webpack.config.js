@@ -22,11 +22,11 @@ const config = {
         publicPath: '/dist',
         filename: 'bundle.js'
     },
-    optimization: {
-        minimizer: [
-            new UglifyJsPlugin({})
-        ]
-    },
+    // optimization: {
+    //     minimizer: [
+    //         new UglifyJsPlugin()
+    //     ]
+    // },
     plugins: [],
     devServer: {
         contentBase: './',
