@@ -23,9 +23,6 @@ export default () => {
         )
         .subscribe(v => console.log(v));
 
-    // fromEventPattern(h => controls.on('rotateA', h))
-    //     .subscribe(v => console.log(v));
-
     //    ---
 
     const log = x => console.log(x);
@@ -57,13 +54,13 @@ export default () => {
 
     const ws = webSocket('ws://localhost:80');
     
-    ws.subscribe(v => console.log(v));
+    ws.subscribe(v => console.log(v), () => {});
 
-    const channelTEST = ws.multiplex(
-        () => ({subscribe: 'TEST'}),
-        () => ({unsubscribe: 'TEST'}),
-        message => message.type === 'TEST'
-    ).subscribe(v => console.log('TEST:', v));
+    const subscribeChannel = (name, h) => ws.multiplex(
+        () => ({subscribe: name}),
+        () => ({unsubscribe: name}),
+        message => message.type === name
+    ).subscribe(h);
 
     interval(1e3).pipe(
         mapTo(2)

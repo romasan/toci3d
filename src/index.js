@@ -1,4 +1,4 @@
-import { interval, animationFrameScheduler } from 'rxjs';
+import { interval, animationFrameScheduler, Subject } from 'rxjs';
 import wsClient from './ws.js';
 import initGL, { Cube } from './gl.js';
 
@@ -37,16 +37,15 @@ const main = () => {
         gl.camera.position.add(wd.multiplyScalar(v))
     });
 
+    const clock = new Subject();
+
     const FPS = 60;
-    interval(1000 / FPS, animationFrameScheduler)
-        .subscribe(t => {
-            controls.update();
-            gl.render();
-        });
+    interval(1000 / FPS, animationFrameScheduler).subscribe(clock);
+
+    clock.subscribe(controls.update);
+    clock.subscribe(gl.render);
     
     // const ws = wsClient();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    main();
-});
+document.addEventListener('DOMContentLoaded', main);
