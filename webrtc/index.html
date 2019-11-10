@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- saved from url=(0065)https://webrtc.github.io/samples/src/content/getusermedia/canvas/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+  <!--<base target="_blank">--><base href="." target="_blank">
+
+  <title>getUserMedia to canvas</title>
+
+<style type="text/css"></style></head>
+
+<body>
+
+  <input type="text" id="input" size="4">ms.
+  <input type="button" id="start" onclick="repeater(input.value|0)" value="GO!">
+  <span id="log"></span>
+
+  <div id="container">
+
+    <video autoplay="" src="" width="640" height="480"></video>
+    <button style="display:none" style="display:none"></button>
+    <a id="downloadLnk" download="YourFileName.jpg" style="display:none"></a>
+    <canvas width="640" height="480" style="display:none"></canvas>
+
+  </div>
+
+  <script src="./adapter.js"></script>
+  <script src="./common.js"></script>
+  <script src="./main.js"></script>
+
+  <script>
+    var _index = 1;
+    var repeater = function(t) {
+      if(typeof t != "number" || t <= 0) t = 6e4;
+      if(_index == 1) {
+        log.innerHTML = 'start repeater: ' + t + 'ms.';
+        canvas.style.display = "block";
+      }
+      button.click();
+      downloadLnk.href = canvas.toDataURL('image/jpeg');
+      var __index = "" + _index;
+      if(__index.length < 8) {
+        __index = (new Array(9 - __index.length).join('0')) + __index;
+      }
+      downloadLnk.download = __index + ".jpg";
+      _index += 1;
+      downloadLnk.click();
+      setTimeout(function() {
+        repeater(t);
+      }, t);
+    }
+  </script>
+
+
+
+
+</body></html>
