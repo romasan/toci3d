@@ -30,8 +30,12 @@ const main = () => {
             cube.rotation.y += v.x;
         });
     }).on('rotateB', v => {
-        gl.camera.rotation.y += -v.x * .5;
-        gl.camera.rotation.x += -v.y * .5;
+        const wd = gl.camera.getWorldDirection(new THREE.Vector3());
+        gl.camera.rotateOnWorldAxis
+        gl.camera.rotation.y += wd.x + (-v.x * .5);
+        gl.camera.rotation.x += wd.y + (-v.y * .5);
+        console.log('rotateWorld:', v, wd);
+        
     }).on('move', v => {
         const wd = gl.camera.getWorldDirection(new THREE.Vector3());
         gl.camera.position.add(wd.multiplyScalar(v))
